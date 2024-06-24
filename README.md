@@ -34,43 +34,71 @@ ml-flask-restful-api/
 
 ### docker-compose.yml
 
-Ce fichier est un fichier `docker-compose.yml` qui utilise Docker Compose pour définir et gérer des services multi-conteneurs. Voici une explication détaillée de chaque section du fichier :
+Ce fichier `docker-compose.yml` est une configuration pour Docker Compose, un outil qui permet de définir et de gérer des applications multi-conteneurs Docker. Voici une explication détaillée du contenu de ce fichier :
 
-```yaml
-version: '3.8'
-```
-- **version**: Cette ligne spécifie la version du format du fichier de composition Docker à utiliser. Ici, `3.8` est utilisé, ce qui permet d'accéder aux fonctionnalités spécifiques à cette version et aux versions antérieures.
+#### Service `api` :
 
 ```yaml
 services:
-```
-- **services**: Cette section définit les services (conteneurs) qui feront partie de notre application multi-conteneurs. Chaque service représente un conteneur ou un groupe de conteneurs qui travaillent ensemble.
-
-```yaml
   api:
-```
-- **api**: C'est le nom du service que nous définissons. Dans ce cas, il représente notre application Flask API.
-
-```yaml
-    build: .
-```
-- **build**: Cette ligne indique que Docker Compose doit construire l'image Docker pour ce service en utilisant le Dockerfile présent dans le répertoire courant (`.`).
-
-```yaml
+    build: ./app
+    container_name: flask-restful-api
     ports:
       - "5000:5000"
-```
-- **ports**: Cette section fait le mapping des ports entre le conteneur et l'hôte. Ici, le port `5000` de l'hôte est lié au port `5000` du conteneur. Cela permet d'accéder à l'application Flask via `http://localhost:5000` sur l'hôte.
-
-```yaml
     volumes:
       - ./app:/app
       - ./model:/model
 ```
-- **volumes**: Cette section monte des volumes entre l'hôte et le conteneur. Les volumes permettent de partager des fichiers entre l'hôte et le conteneur, facilitant ainsi le développement et le test en temps réel.
-  - `./app:/app`: Monte le répertoire `app` de l'hôte dans le répertoire `/app` du conteneur. Cela permet de modifier le code source sur l'hôte et de voir les changements en temps réel dans le conteneur.
-  - `./model:/model`: Monte le répertoire `model` de l'hôte dans le répertoire `/model` du conteneur. Cela permet d'utiliser et de mettre à jour les fichiers de modèle facilement.
 
+- **build**: Indique le chemin vers le répertoire contenant le `Dockerfile` pour construire l'image Docker du service `api`. Dans ce cas, il se trouve dans le répertoire `./app`.
+  
+- **container_name**: Spécifie le nom du conteneur Docker qui sera créé pour le service `api`. Ici, il est nommé `flask-restful-api`.
+  
+- **ports**: Définit le mapping des ports entre le conteneur et l'hôte. Dans ce cas, le port `5000` du conteneur est exposé sur le port `5000` de l'hôte (votre machine locale).
+  
+- **volumes**: Montre les volumes Docker utilisés pour partager des données entre le conteneur et l'hôte. Les chemins spécifiés (`./app` et `./model`) montent les répertoires locaux dans les chemins correspondants à l'intérieur du conteneur (`/app` et `/model`).
+
+#### Service `jupyter` :
+
+```yaml
+  jupyter:
+    build: ./notebooks
+    container_name: jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/notebooks
+      - ./model:/model
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+```
+
+- **build**: Spécifie le chemin vers le répertoire contenant le `Dockerfile` pour construire l'image Docker du service `jupyter`. Dans ce cas, il se trouve dans le répertoire `./notebooks`.
+  
+- **container_name**: Nomme le conteneur Docker créé pour le service `jupyter` en tant que `jupyter`.
+  
+- **ports**: Mappe le port `8888` du conteneur sur le port `8888` de l'hôte (votre machine locale), permettant l'accès à Jupyter Lab depuis votre navigateur.
+  
+- **volumes**: Montre les volumes Docker utilisés pour partager des données entre le conteneur et l'hôte. Les chemins spécifiés (`./notebooks` et `./model`) montent les répertoires locaux dans les chemins correspondants à l'intérieur du conteneur (`/notebooks` et `/model`).
+  
+- **environment**: Définit les variables d'environnement spécifiques au conteneur. Ici, `JUPYTER_ENABLE_LAB=yes` indique que Jupyter Lab doit être activé lorsque le conteneur démarre.
+
+### Utilisation de docker-compose.yml
+
+- Pour démarrer les services définis dans ce fichier `docker-compose.yml`, vous pouvez exécuter la commande suivante à partir du répertoire où se trouve ce fichier :
+  
+  ```bash
+  docker-compose up
+  ```
+  
+  Cette commande construira les images Docker spécifiées dans les `Dockerfile`, créera et démarrera les conteneurs correspondants (`api` et `jupyter`), en suivant les configurations définies.
+
+- Pour arrêter et supprimer les conteneurs créés par `docker-compose up`, utilisez la commande suivante :
+  
+  ```bash
+  docker-compose down
+  ```
+  
 ### Étapes
 
 1. Cloner le dépôt :
@@ -97,7 +125,7 @@ services:
 - **Exemple de requête:**
   ```json
   {
-      "features": [1, 0, ...]
+      "features": [1, ...]
   }
   ```
 - **Exemple de réponse:**
