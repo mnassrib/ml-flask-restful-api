@@ -32,11 +32,12 @@ ml-flask-restful-api/
 - Docker
 - Docker compose
 
-### docker-compose.yml
+---
+#### docker-compose.yml
 
 Ce fichier `docker-compose.yml` est une configuration pour Docker Compose, un outil qui permet de définir et de gérer des applications multi-conteneurs Docker. Voici une explication détaillée du contenu de ce fichier :
 
-#### Service `api` :
+##### Service `api` :
 
 ```yaml
 services:
@@ -58,7 +59,7 @@ services:
   
 - **volumes**: Montre les volumes Docker utilisés pour partager des données entre le conteneur et l'hôte. Les chemins spécifiés (`./app` et `./model`) montent les répertoires locaux dans les chemins correspondants à l'intérieur du conteneur (`/app` et `/model`).
 
-#### Service `jupyter` :
+##### Service `jupyter` :
 
 ```yaml
   jupyter:
@@ -83,7 +84,7 @@ services:
   
 - **environment**: Définit les variables d'environnement spécifiques au conteneur. Ici, `JUPYTER_ENABLE_LAB=yes` indique que Jupyter Lab doit être activé lorsque le conteneur démarre.
 
-### Utilisation de docker-compose.yml
+#### Utilisation de docker-compose.yml
 
 - Pour démarrer les services définis dans ce fichier `docker-compose.yml`, vous pouvez exécuter la commande suivante à partir du répertoire où se trouve ce fichier :
   
@@ -98,7 +99,8 @@ services:
   ```bash
   docker-compose down
   ```
-  
+---
+
 ### Étapes
 
 1. Cloner le dépôt :
