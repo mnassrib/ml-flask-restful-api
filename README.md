@@ -1,4 +1,4 @@
-# API de modèle de Machine Learning avec Flask-RESTful et Docker
+# API pour un Modèle de Machine Learning avec Flask-RESTful et Docker
 
 Ce projet utilise Flask-RESTful pour simplifier la création de l'API REST, en suivant les pratiques courantes pour la construction de services RESTful. La documentation et la structure du projet sont conçues pour être claires et faciles à comprendre.
 
@@ -19,7 +19,6 @@ ml-flask-restful-api/
 │   └── model.pkl
 ├── notebooks/
 │   ├── train_model.ipynb
-│   ├── analyse.ipynb
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── docker-compose.yml
@@ -76,7 +75,7 @@ services:
 
 1. Cloner le dépôt :
     ```bash
-    git clone <url_du_dépôt>
+    git clone https://github.com/mnassrib/ml-flask-restful-api.git
     cd ml-flask-restful-api
     ```
 
@@ -98,7 +97,7 @@ services:
 - **Exemple de requête:**
   ```json
   {
-      "features": [1, 0]
+      "features": [1, 0, ...]
   }
   ```
 - **Exemple de réponse:**
@@ -133,7 +132,7 @@ Pour tester une requête POST directement depuis le navigateur en utilisant une 
    - Dans la section du corps de la requête, ajoutez les données JSON que vous souhaitez envoyer à votre endpoint Flask. Par exemple :
      ```json
      {
-       "features": [1.2, 1]
+       "features": [1, ...]
      }
      ```
 
@@ -160,7 +159,7 @@ Pour tester une requête POST directement depuis le navigateur en utilisant une 
    - Dans la section du corps de la requête, ajoutez les données JSON que vous souhaitez envoyer à votre endpoint Flask. Par exemple :
      ```json
      {
-       "features": [1.2, 1]
+       "features": [1, ...]
      }
      ```
 
@@ -187,11 +186,9 @@ En suivant ces étapes avec l'extension REST Client pour Chrome ou RESTer pour F
 
 ## Entraînement du modèle
 
-Pour entraîner le modèle, exécutez le script `model/train_model.py`. Cela générera un fichier `model.pkl` qui sera utilisé par l'API pour les prédictions.
+Pour réentraîner le modèle ou entraîner un nouveau modèle sur un nouveau jeu de données, exécutez le script `notebooks/train_model.ipynb`. Cela générera un fichier `model.pkl` qui sera utilisé par l'API pour les prédictions.
 
-```bash
-python model/train_model.py
-```
+Redémarrer votre application Flask : Après avoir mis à jour le modèle sauvegardé, redémarrez votre application Flask. Cela peut être fait manuellement en arrêtant le conteneur Docker Flask actuel (docker-compose down ou docker stop <container_id>) et en le relançant (docker-compose up --build ou docker-compose up -d si vous utilisez Docker Compose).
 
 ## Contribution
 
