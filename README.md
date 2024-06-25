@@ -1,124 +1,106 @@
-# API pour un Modèle de Machine Learning avec Flask-RESTful et Docker
+# API pour une applivation de pédiction avec Flask-RESTful et Docker
 
 Ce projet utilise Flask-RESTful pour simplifier la création de l'API REST, en suivant les pratiques courantes pour la construction de services RESTful. La documentation et la structure du projet sont conçues pour être claires et faciles à comprendre.
 
-## Description
+## Objectif
 
-Cette API permet de faire des prédictions en utilisant un modèle de Machine Learning. Elle est construite avec Flask et Flask-RESTful, et utilise Docker pour une gestion facile des dépendances et du déploiement.
+L'objectif de ce projet est de créer une API permettant de faire des prédictions en utilisant un modèle de Machine Learning. Cette API est construite avec Flask et Flask-RESTful, et utilise Docker pour une gestion facile des dépendances et du déploiement. Un service JupyterLab est également inclus pour l'entraînement interactif du modèle.
 
 ## Structure du projet
 
+Le projet est structuré comme suit :
+
 ```
 ml-flask-restful-api/
-├── app/
-│   ├── api.py
+├── api/
 │   ├── app.py
-│   ├── requirements.txt
-│   └── Dockerfile
-├── model/
-│   └── model.pkl
-├── notebooks/
-│   ├── train_model.ipynb
-│   ├── requirements.txt
-│   └── Dockerfile
+│   ├── Dockerfile
+│   ├── model.pkl
+│   └── requirements.txt
+├── jupyter/
+│   ├── train_model_4_features.ipynb
+│   ├── train_model_5_features.ipynb
+│   ├── Dockerfile
+│   └── requirements.txt
 ├── docker-compose.yml
 └── README.md
 ```
 
-## Installation et exécution
+### api/
 
-### Prérequis
+Contient le code de l'API Flask.
 
-- Docker
-- Docker compose
+- **app.py** : Code source de l'API Flask.
+- **model.pkl** : Un modèle pour la prédiction.
+- **Dockerfile** : Instructions pour construire l'image Docker de l'API.
+- **requirements.txt** : Dépendances Python pour l'API Flask.
 
----
-#### docker-compose.yml
+### jupyter/
 
-Ce fichier `docker-compose.yml` est une configuration pour Docker Compose, un outil qui permet de définir et de gérer des applications multi-conteneurs Docker. Voici une explication détaillée du contenu de ce fichier :
+Contient le notebook Jupyter pour l'entraînement du modèle.
 
-##### Service `api` :
+- **train_model_4_features.ipynb** : Un premier Notebook Jupyter pour entraîner et sauvegarder le modèle.
+- **train_model_5_features.ipynb** : Un deuxième Notebook Jupyter pour entraîner et sauvegarder le modèle.
+- **Dockerfile** : Instructions pour construire l'image Docker de JupyterLab.
+- **requirements.txt** : Dépendances Python pour JupyterLab.
 
-```yaml
-services:
-  api:
-    build: ./app
-    container_name: flask-restful-api
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./app:/app
-      - ./model:/model
+### docker-compose.yml
+
+Fichier de configuration Docker Compose pour orchestrer les conteneurs API et JupyterLab.
+
+## Volumes et relations
+
+Les volumes permettent de partager des fichiers entre les conteneurs et l'hôte, facilitant ainsi l'accès aux modèles sauvegardés.
+
+- **api** service :
+  - `./api:/app` : Monte le répertoire `./api` de l'hôte dans `/app` dans le conteneur API.
+  - Permet à l'API Flask d'accéder au modèle sauvegardé.
+
+- **jupyter** service :
+  - `./jupyter:/home/jovyan` : Monte le répertoire `./jupyter` de l'hôte dans `/home/jovyan` dans le conteneur JupyterLab.
+  - `./api:/app` : Monte le répertoire `./api` de l'hôte dans `/app` dans le conteneur JupyterLab.
+  - Permet à JupyterLab de sauvegarder le modèle dans un répertoire partagé accessible par l'API.
+
+## Cloner le dépôt
+
+```bash
+git clone https://github.com/mnassrib/ml-flask-restful-api.git
+cd ml-flask-restful-api
 ```
 
-- **build**: Indique le chemin vers le répertoire contenant le `Dockerfile` pour construire l'image Docker du service `api`. Dans ce cas, il se trouve dans le répertoire `./app`.
-  
-- **container_name**: Spécifie le nom du conteneur Docker qui sera créé pour le service `api`. Ici, il est nommé `flask-restful-api`.
-  
-- **ports**: Définit le mapping des ports entre le conteneur et l'hôte. Dans ce cas, le port `5000` du conteneur est exposé sur le port `5000` de l'hôte (votre machine locale).
-  
-- **volumes**: Montre les volumes Docker utilisés pour partager des données entre le conteneur et l'hôte. Les chemins spécifiés (`./app` et `./model`) montent les répertoires locaux dans les chemins correspondants à l'intérieur du conteneur (`/app` et `/model`).
+## Commandes
 
-##### Service `jupyter` :
+### Construction, lancement et arrêt des conteneurs
 
-```yaml
-  jupyter:
-    build: ./notebooks
-    container_name: jupyter
-    ports:
-      - "8888:8888"
-    volumes:
-      - ./notebooks:/notebooks
-      - ./model:/model
-    environment:
-      - JUPYTER_ENABLE_LAB=yes
+- Pour construire et lancer les conteneurs, utilisez Docker Compose :
+
+```sh
+docker-compose up --build
 ```
-
-- **build**: Spécifie le chemin vers le répertoire contenant le `Dockerfile` pour construire l'image Docker du service `jupyter`. Dans ce cas, il se trouve dans le répertoire `./notebooks`.
-  
-- **container_name**: Nomme le conteneur Docker créé pour le service `jupyter` en tant que `jupyter`.
-  
-- **ports**: Mappe le port `8888` du conteneur sur le port `8888` de l'hôte (votre machine locale), permettant l'accès à Jupyter Lab depuis votre navigateur.
-  
-- **volumes**: Montre les volumes Docker utilisés pour partager des données entre le conteneur et l'hôte. Les chemins spécifiés (`./notebooks` et `./model`) montent les répertoires locaux dans les chemins correspondants à l'intérieur du conteneur (`/notebooks` et `/model`).
-  
-- **environment**: Définit les variables d'environnement spécifiques au conteneur. Ici, `JUPYTER_ENABLE_LAB=yes` indique que Jupyter Lab doit être activé lorsque le conteneur démarre.
-
-#### Utilisation de docker-compose.yml
-
-- Pour démarrer les services définis dans ce fichier `docker-compose.yml`, vous pouvez exécuter la commande suivante à partir du répertoire où se trouve ce fichier :
-  
-  ```bash
-  docker-compose up
-  ```
-  
-  Cette commande construira les images Docker spécifiées dans les `Dockerfile`, créera et démarrera les conteneurs correspondants (`api` et `jupyter`), en suivant les configurations définies.
 
 - Pour arrêter et supprimer les conteneurs créés par `docker-compose up`, utilisez la commande suivante :
   
-  ```bash
-  docker-compose down
-  ```
----
+```bash
+docker-compose down
+```
 
-### Étapes
+### Accéder à JupyterLab
 
-1. Cloner le dépôt :
-    ```bash
-    git clone https://github.com/mnassrib/ml-flask-restful-api.git
-    cd ml-flask-restful-api
-    ```
+Ouvrez votre navigateur et accédez à `http://localhost:8888` pour utiliser JupyterLab. Utilisez un des notebooks `train_model_?_features.ipynb` pour entraîner et sauvegarder un modèle.
 
-2. Construire et démarrer les conteneurs Docker :
-    ```bash
-    docker-compose up --build
-    ```
+### Tester l'API Flask
 
-3. L'API sera accessible à `http://localhost:5000`.
+L'API Flask est accessible sur `http://localhost:5000/predict`. Envoyez une requête POST avec les caractéristiques à prédire. Par exemple, utilisez `curl` :
 
-## Utilisation de l'API
+```sh
+curl -X POST http://localhost:5000/predict -H "Content-Type: application/json" -d '{"features": [5.1, 3.5, 1.4, 0.2]}'
+```
 
-### Endpoint `/predict`
+### Utilisation de l'API
+
+L'API sera accessible à `http://localhost:5000`.
+
+#### Endpoint `/predict`
 
 - **URL:** `/predict`
 - **Méthode:** `POST`
@@ -142,7 +124,7 @@ services:
 
 Pour tester une requête POST directement depuis le navigateur en utilisant une extension comme "REST Client" pour Chrome ou "RESTer" pour Firefox, suivez les étapes détaillées ci-dessous :
 
-##### Utilisation de l'extension REST Client pour Chrome
+###### Utilisation de l'extension REST Client pour Chrome
 
 1. **Installation de l'extension REST Client** :
    - Ouvrez le navigateur Chrome.
@@ -169,7 +151,7 @@ Pour tester une requête POST directement depuis le navigateur en utilisant une 
 5. **Envoyer la requête** :
    - Une fois que vous avez configuré tous les détails nécessaires (URL, méthode POST, en-têtes, corps de la requête), cliquez sur le bouton "Send" pour envoyer la requête à votre application Flask.
 
-##### Utilisation de l'extension RESTer pour Firefox
+###### Utilisation de l'extension RESTer pour Firefox
 
 1. **Installation de l'extension RESTer** :
    - Ouvrez le navigateur Firefox.
@@ -196,13 +178,13 @@ Pour tester une requête POST directement depuis le navigateur en utilisant une 
 5. **Envoyer la requête** :
    - Une fois que vous avez configuré tous les détails nécessaires (URL, méthode POST, en-têtes, corps de la requête), cliquez sur le bouton "Send" pour envoyer la requête à votre application Flask.
 
-##### Conclusion
+###### Conclusion
 
-En suivant ces étapes avec l'extension REST Client pour Chrome ou RESTer pour Firefox, vous pouvez facilement tester des requêtes POST directement depuis votre navigateur. Assurez-vous que votre application Flask est en cours d'exécution sur `http://127.0.0.1:5000` et que votre endpoint `/predict` est configuré pour accepter et traiter les requêtes POST avec des données JSON. Cela vous permettra de vérifier le bon fonctionnement de votre API Flask avec différentes entrées de données.
+En suivant ces étapes avec l'extension REST Client pour Chrome ou RESTer pour Firefox, vous pouvez facilement tester des requêtes POST directement depuis le navigateur. Assurez-vous que votre application Flask est en cours d'exécution sur `http://127.0.0.1:5000` et que votre endpoint `/predict` est configuré pour accepter et traiter les requêtes POST avec des données JSON. Cela vous permettra de vérifier le bon fonctionnement de votre API Flask avec différentes entrées de données.
 
 ---
 
-### Endpoint `/health`
+#### Endpoint `/health`
 
 - **URL:** `/health`
 - **Méthode:** `GET`
@@ -214,11 +196,25 @@ En suivant ces étapes avec l'extension REST Client pour Chrome ou RESTer pour F
   }
   ```
 
-## Entraînement du modèle
+## Entraînement d'un modèle
 
-Pour réentraîner le modèle ou entraîner un nouveau modèle sur un nouveau jeu de données, exécutez le script `notebooks/train_model.ipynb`. Cela générera un fichier `model.pkl` qui sera utilisé par l'API pour les prédictions.
+Exécutez un des notebooks `train_model_?_features.ipynb` pour entraîner le modèle et le sauvegarder dans `/app/model.pkl` qui sera utilisé par l'API Flask. Cette dernièrre chargera le modèle depuis `/app/model.pkl`, accessible via `./api/model.pkl` sur l'hôte.
 
-Redémarrer votre application Flask : Après avoir mis à jour le modèle sauvegardé, redémarrez votre application Flask. Cela peut être fait manuellement en arrêtant le conteneur Docker Flask actuel (docker-compose down ou docker stop <container_id>) et en le relançant (docker-compose up --build ou docker-compose up -d si vous utilisez Docker Compose).
+L'une des grandes avantages d'utiliser Docker avec des volumes montés est que les modifications apportées aux fichiers dans les volumes montés sont immédiatement disponibles dans le conteneur sans avoir besoin de redémarrer le conteneur. Voici comment cela fonctionne :
+
+### Flux de travail pour la mise à jour du modèle
+
+1. **Entraînement et sauvegarde du modèle avec JupyterLab** :
+   - Vous utilisez JupyterLab pour réentraîner le modèle et le sauvegarder dans le répertoire `/app`, qui correspond à `./api` sur l'hôte.
+   - Exemple : Vous exécutez un des notebooks `train_model_?_features.ipynb` qui réentraîne le modèle et sauvegarde le nouveau modèle dans `/app/model.pkl`.
+
+2. **Accès immédiat par l'API Flask** :
+   - L'API Flask est déjà configurée pour charger le modèle depuis `/app/model.pkl` lors de la réception d'une requête.
+   - Si le fichier `model.pkl` est mis à jour, le conteneur API verra automatiquement la nouvelle version du fichier.
+
+### Conclusion
+
+Avec les volumes montés de Docker, les modifications apportées au modèle sauvegardé par JupyterLab seront automatiquement disponibles pour le conteneur API. Pour refléter les changements du modèle sans redémarrer l'API Flask, vous pouvez recharger le modèle dynamiquement soit à chaque requête, soit via un endpoint spécifique pour le rechargement. Cela permet une flexibilité maximale pour mettre à jour et utiliser votre modèle de machine learning en production.
 
 ## Contribution
 

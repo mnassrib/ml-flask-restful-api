@@ -1,22 +1,21 @@
-version: '3.8'
+version: '3.7'
 
 services:
   api:
-    build: ./app
-    container_name: flask-restful-api
+    build: ./api
+    container_name: restfulapi
     ports:
       - "5000:5000"
     volumes:
-      - ./app:/app
-      - ./model:/model
+      - ./api:/app
 
   jupyter:
-    build: ./notebooks
-    container_name: jupyter
+    build: ./jupyter
+    container_name: jupyterlab
     ports:
       - "8888:8888"
     volumes:
-      - ./notebooks:/notebooks
-      - ./model:/model
+      - ./jupyter:/home/jovyan
+      - ./api:/app
     environment:
       - JUPYTER_ENABLE_LAB=yes
