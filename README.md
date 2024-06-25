@@ -1,4 +1,4 @@
-# API pour une applivation de pédiction avec Flask-RESTful et Docker
+# API pour une application de pédiction avec Flask-RESTful et Docker
 
 Ce projet utilise Flask-RESTful pour simplifier la création de l'API REST, en suivant les pratiques courantes pour la construction de services RESTful. La documentation et la structure du projet sont conçues pour être claires et faciles à comprendre.
 
